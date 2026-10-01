@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>代謝マスター</title>
+<style>
+:root{--bg:#eaf7ee;--pn:#fff;--tx:#1c3a2a;--bd:#2f7d4f;--y:#ffe27a;--b:#9fd3ff;--g:#a8e6b0;--p:#d8b8ff;--ok:#1f9d55;--ng:#d6393a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12261a;--pn:#1c3a2a;--tx:#eaf7ee;--bd:#6fcf97;--y:#a8861a;--b:#2a6a9a;--g:#2d7a45;--p:#6a4a9a}}
+*{box-sizing:border-box}html,body{margin:0}
+body{background:var(--bg);color:var(--tx);font-family:"Hiragino Maru Gothic ProN","Yu Gothic",system-ui,sans-serif;padding:12px;max-width:760px;margin:auto}
+h1{margin:0;font-size:1.6rem;text-align:center}.sub{text-align:center;margin:2px 0 10px;font-size:.9rem}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;background:var(--pn);border:3px solid var(--bd);border-radius:14px;padding:8px 12px;font-weight:700}
+button{font:inherit;font-weight:700;border:3px solid var(--bd);background:var(--y);color:#1c3a2a;border-radius:12px;padding:8px 14px;cursor:pointer;box-shadow:0 3px 0 var(--bd)}
+button:active{transform:translateY(2px);box-shadow:0 1px 0 var(--bd)}button:focus-visible,.card:focus-visible,.slot:focus-visible{outline:3px solid #ff7a00}
+.panel{background:var(--pn);border:3px solid var(--bd);border-radius:16px;padding:12px;margin-top:10px}
+.pool{display:flex;flex-wrap:wrap;gap:8px}
+.card{border:3px solid var(--bd);border-radius:12px;padding:8px 10px;font-weight:700;cursor:grab;user-select:none;color:#1c3a2a;touch-action:manipulation}
+.card.sel{outline:4px solid #ff7a00;transform:scale(1.06)}
+.y{background:var(--y)}.b{background:var(--b)}.g{background:var(--g)}.p{background:var(--p)}
+.field{text-align:center}.t{font-weight:700;margin:6px 0}.arrow{font-size:1.4rem;margin:4px 0}
+.row{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.slot{min-width:92px;min-height:48px;border:3px dashed var(--bd);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:4px}
+.slot.over{background:#ffd9a0}.slot .card{cursor:pointer;margin:0}
+.proc{display:inline-block;background:var(--g);color:#1c3a2a;border:3px solid var(--bd);border-radius:999px;padding:6px 18px;font-weight:700}
+#msg{text-align:center;font-weight:700;font-size:1.2rem;min-height:1.6em;margin-top:8px}.ok{color:var(--ok)}.ng{color:var(--ng)}
+#ex{margin-top:6px;white-space:pre-line}.acts{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+.small{font-size:.85rem}.tm{display:flex;gap:6px;align-items:center}
+.q{font-weight:700;margin-bottom:10px;text-align:left}.dia{display:flex;align-items:center;justify-content:center;gap:6px}
+.col{display:flex;flex-direction:column;gap:6px;align-items:center}.ar{font-size:1.3rem}.dn{font-size:1.5rem;margin:6px 0 2px}
+.slot:empty::before{content:"？";font-size:1.4rem;opacity:.5}.card.fx{cursor:default;border-style:solid;opacity:.95}
+.dia .proc{padding:14px 10px;border-radius:14px}.slot{min-width:88px}@media(max-width:420px){.card,.slot{font-size:.85rem;padding:6px}.slot{min-width:78px}.ar{font-size:1rem}}
+.wb{margin:10px auto 6px;display:inline-block;background:var(--g);border:2px solid var(--bd);border-radius:8px;padding:2px 10px;font-weight:700;font-size:.85rem;color:#1c3a2a}.pool .card{font-size:.85rem;padding:6px 8px}
+.fw{overflow-x:auto}.fg{position:relative;min-width:680px}.fg svg{width:100%;height:100%;display:block}
+.fg svg line,.fg svg path{fill:none;stroke:var(--bd);stroke-width:2.5}.fg svg rect,.fg svg ellipse{fill:var(--g);fill-opacity:.4;stroke:var(--bd);stroke-width:2.5}
+.fg svg marker path{fill:var(--bd);stroke:none}.fg svg text{fill:var(--tx)}
+.fg .slot{position:absolute;transform:translate(-50%,-50%);min-width:72px;min-height:36px;padding:2px;background:var(--pn)}
+.fg .slot .card{font-size:.78rem;padding:4px 6px;white-space:nowrap}.slot.ok{border:3px solid var(--ok);background:#d8f5df}.slot.ng{border:3px solid var(--ng);background:#ffd9d9}
+.fg svg circle.dot{fill:var(--bd);stroke:none}.fg .slot[data-c]::after{content:'×'attr(data-c);position:absolute;top:-12px;right:-8px;background:var(--pn);border:2px solid var(--bd);border-radius:9px;padding:0 5px;font-size:.7rem;font-weight:700;line-height:1.3;color:var(--tx)}
+</style></head><body>
+<h1>🌿 代謝マスター</h1><p class="sub">〜光合成と呼吸の物質パズル〜</p>
+<div class="panel" style="margin:0 0 8px">名前：<input id="nm" maxlength="30" placeholder="例：2年3組12番 山田花子" style="font:inherit;padding:6px;width:min(100%,280px)"> <button id="sub">結果を先生に送る</button></div>
+<div class="panel" id="sb" hidden><div>下の文章をコピーして、先生に送ってね（Classroomなど）。</div><textarea id="sbt" rows="7" readonly style="width:100%;font:inherit;margin:6px 0"></textarea><button id="cp">コピー</button> <button id="sbx">とじる</button> <span id="cpm"></span></div>
+<div class="bar"><span id="st"></span><span id="sc"></span><label class="tm"><input type="checkbox" id="tm">教師モード</label></div>
+<div class="panel"><div class="small">上のカードを、下の図の「？」にドラッグしよう（スマホは、カードをタップ→？をタップ）。？をタップすると外せるよ。</div>
+<div class="pool" id="pool" style="margin-top:8px"></div></div>
+<div class="panel field" id="field"></div>
+<div id="msg" role="status"></div><div id="ex" class="panel" hidden></div>
+<div class="acts"><button id="chk">判定する</button><button id="hint">ヒント</button><button id="nxt" hidden>次のステージへ</button></div>
+<div class="panel" id="pw" hidden><div id="pwl"></div><input id="pwi" type="password" autocomplete="off" style="font:inherit;padding:6px;margin:6px 6px 0 0"><button id="pwok">OK</button> <button id="pwno">とじる</button></div>
+<div class="panel" id="teacher" hidden></div>
+<script>
+const K={光:['☀','y'],ATP:['🔋','y'],ADP:['⚡','y'],酸素:['🫧','b'],CO2:['🌿','b'],水:['💧','b'],グルコース:['🍬','g'],PGA:['🧪','g'],GAP:['🧬','g'],NADPH:['📦','p'],'NADP+':['📭','p'],'NAD+':['🔹','p'],NADH:['🔷','p'],FAD:['🔸','p'],FADH2:['🔶','p'],RuBP:['🔁','g'],ピルビン酸:['🥎','g'],アセチルCoA:['🧫','g'],'H+':['🔺','b'],'e-':['✨','y'],オキサロ酢酸:['🟤','g'],クエン酸:['🟤','g'],'α-ケトグルタル酸':['🟤','g'],コハク酸:['🟤','g']};
+const LB={CO2:'CO₂','NADP+':'NADP⁺','NAD+':'NAD⁺','H+':'H⁺','e-':'e⁻',FADH2:'FADH₂'};const lab=k=>LB[k]||k;
+const S=[
+{n:'ステージ1 光化学反応',q:'チラコイド膜での反応。図の？にカードをドラッグしよう',h:'水が分解されて、酸素・H⁺・電子(e⁻)ができるよ。電子はNADP⁺に渡されるよ',e:'光化学系Ⅱで水を分解して酸素を出し、電子を取り出す。\n電子は電子伝達系→光化学系Ⅰと流れてNADPHができる。\nH⁺の濃度差を使ってATP合成酵素がATPを作る（光リン酸化）。',b:[
+{w:'チラコイド膜　光化学系Ⅱ',i:['光','?水'],p:'光化学系Ⅱ',o:['?酸素','H+','e-']},
+{w:'チラコイド膜　光化学系Ⅰ',i:['e-','H+','?NADP+'],p:'光化学系Ⅰ',o:['?NADPH'],n:'電子は 光化学系Ⅱ→電子伝達系→光化学系Ⅰ と流れるよ'},
+{w:'チラコイド膜　ATP合成酵素',i:['H+','?ADP'],p:'光リン酸化',o:['?ATP']}]},
+{n:'ステージ2 カルビン回路',q:'ストロマでの反応。図の？にカードをドラッグしよう',h:'CO₂はRuBPにくっついてPGAになるよ。ATPとNADPHでGAPになるよ',e:'CO₂がRuBPと結合してPGAになる（ルビスコ）。\nPGAはATPとNADPH（チラコイド由来）でGAPになる。\nGAPの一部が有機物（グルコースなど）になり、残りはRuBPに戻る。',b:[
+{w:'ストロマ',i:['?CO2','RuBP'],p:'ルビスコ',o:['?PGA']},
+{i:['PGA','?ATP','?NADPH'],p:'還元',o:['?GAP']},
+{i:['GAP'],p:'有機物の合成',o:['?グルコース']},
+{i:['GAP','ATP'],p:'再生',o:['?RuBP'],n:'↩ RuBPにもどって、また回る（だから「回路」！）'}]},
+{n:'ステージ3 解糖系',q:'細胞質基質での反応。図の？にカードをドラッグしよう',h:'グルコース→GAP→ピルビン酸の順。ATPは使ってから、たくさん作るよ',e:'グルコースは2ATPを使ってGAPになり、\nGAPは脱水素酵素のはたらきでピルビン酸になる。\nNADHと4ATPができ、差し引き2ATPが得られる。',b:[
+{w:'細胞質基質',i:['?グルコース','ATP'],p:'リン酸化・分解',o:['?GAP','ADP']},
+{i:['GAP','NAD+','ADP'],p:'脱水素酵素',o:['?ピルビン酸','?NADH','?ATP']}]},
+{n:'ステージ4 クエン酸回路',q:'ミトコンドリアのマトリックスでの反応。図の？にカードをドラッグしよう',h:'ピルビン酸→アセチルCoA→回路。CO₂が出て、NADHやFADH₂ができるよ',e:'ピルビン酸は脱炭酸・脱水素でアセチルCoAになる。\nクエン酸回路でCO₂が出て、ATP・NADH・FADH₂ができる。',b:[
+{w:'マトリックス',i:['?ピルビン酸','NAD+'],p:'脱炭酸・脱水素',o:['?アセチルCoA','?CO2','NADH']},
+{i:['アセチルCoA','ADP','NAD+','FAD'],p:'クエン酸回路',o:['?ATP','?NADH','?FADH2','CO2']}]},
+{n:'ステージ5 電子伝達系',q:'ミトコンドリア内膜での反応。図の？にカードをドラッグしよう',h:'NADHとFADH₂が電子を渡し、最後は酸素と結びついて水になるよ',e:'NADH・FADH₂が電子とH⁺を渡し、NAD⁺・FADにもどる。\nH⁺の濃度差でATP合成酵素がATPを作る（酸化的リン酸化）。\n最後に電子・H⁺・酸素が結びついて水ができる。',b:[
+{w:'内膜',i:['?NADH','?FADH2'],p:'電子伝達系',o:['NAD+','FAD','e-','H+']},
+{i:['H+','?ADP'],p:'ATP合成酵素',o:['?ATP']},
+{i:['e-','H+','?酸素'],p:'最終の反応',o:['?水']}]}];
+const FIG=[
+{H:400,it:[['t',105,16,'☀ 光エネルギー',13],['a',105,24,105,75],['t',645,16,'☀ 光エネルギー',13],['a',645,24,645,75],
+['r',40,40,130,70,'光化学系Ⅱ'],['r',310,40,130,70,'電子伝達系'],['r',580,40,130,70,'光化学系Ⅰ'],
+['a',105,75,375,75],['t',240,66,'24 e⁻'],['a',375,75,645,75],['t',510,66,'24 e⁻'],
+['s',95,195,'水','','12'],['a',95,195,105,75],['s',240,195,'酸素','','6'],['a',105,75,240,195],['t',335,200,'+ 24 H⁺'],
+['r',290,230,170,48,'H⁺の濃度勾配をつくる'],['r',300,320,150,36,'ATP合成酵素'],['a',375,75,375,254],['a',375,254,375,338],
+['s',570,305,'ADP','','12'],['a',570,305,375,338],['a',375,338,570,372],['s',570,372,'ATP','','12'],
+['a',645,75,645,244],['o',645,250],['t',705,160,'24 e⁻'],['s',712,250,'NADP+','','12'],['a',712,250,560,250],['s',560,250,'NADPH','','12'],['t',650,282,'+ 12 H⁺']]},
+{H:400,it:[['t',45,25,'ストロマ',13],['p','M217 135 A130 130 0 0 1 374 78'],['p','M374 78 A130 130 0 0 1 430 284'],['p','M430 284 A130 130 0 0 1 217 135'],
+['s',217,135,'RuBP','','6'],['t',150,155,'C₅',13],['s',374,78,'PGA','','12'],['t',430,70,'C₃',13],['s',430,284,'GAP','','12'],['t',490,292,'C₃',13],['t',330,200,'カルビン回路',20],
+['s',95,65,'CO2','','6'],['o',286,78],['a',95,65,282,79],['t',230,46,'ルビスコ',12],
+['o',456,166],['s',615,145,'ATP','g','12'],['a',615,145,459,167],['s',630,230,'NADPH','g','12'],['a',630,230,459,169],
+['o',456,234],['a',456,234,590,300],['t',640,308,'6 H₂O'],
+['o',255,306],['s',100,300,'ATP','','6'],['a',100,300,251,306],
+['o',290,324],['t',50,345,'有機物',13],['s',100,375,'グルコース'],['a',290,324,100,375]]},
+{H:460,it:[['t',80,40,'細胞質基質',14],['t',420,45,'C₆'],['s',500,40,'グルコース'],['t',420,190,'C₃'],['s',500,190,'GAP','','2'],['t',420,360,'C₃'],['s',500,360,'ピルビン酸','','2'],
+['a',500,40,500,190],['a',500,190,500,360],['a',500,360,500,418],
+['o',500,118],['t',455,125,'①'],['s',650,90,'ATP','','2'],['s',650,146,'ADP','','2'],['p','M650 90 Q500 90 500 118 Q500 146 650 146'],['t',735,150,'+ 2P',13],
+['o',500,300],['t',455,307,'③'],['s',650,265,'ADP','','4'],['s',650,335,'ATP','','4'],['p','M650 265 Q500 265 500 300 Q500 335 650 335'],['t',735,270,'+ 4P',13],
+['o',500,235],['t',330,200,'②'],['s',250,200,'NAD+','','2'],['s',250,270,'NADH','','2'],['p','M250 200 Q500 200 500 235 Q500 270 250 270'],['t',400,242,'脱水素酵素',13],['t',250,305,'+ 2H⁺',13],
+['l',20,392,780,392],['t',500,440,'クエン酸回路へ',14],['t',130,420,'ミトコンドリア（マトリックス）',13]]},
+{H:620,it:[['t',70,30,'細胞質基質',13],['l',20,62,780,62],['t',115,82,'ミトコンドリア（マトリックス）',13],
+['s',400,30,'ピルビン酸','','2'],['s',400,175,'アセチルCoA','','2'],['a',400,30,400,175],['o',400,118],
+['t',255,102,'NAD⁺'],['s',235,150,'NADH','a','2'],['p','M288 98 Q400 98 400 118 Q400 138 235 150'],['s',595,118,'CO2','a','2'],['a',400,118,595,118],
+['p','M300 262 Q400 190 500 262'],['p','M500 262 Q580 363 500 464'],['p','M500 464 Q400 520 300 464'],['p','M300 464 Q220 363 300 262'],['a',400,175,400,224],
+['s',300,262,'オキサロ酢酸','','2'],['s',500,262,'クエン酸','','2'],['s',500,464,'α-ケトグルタル酸','','2'],['s',300,464,'コハク酸','','2'],
+['t',215,266,'C₄'],['t',582,266,'C₆'],['t',600,468,'C₅'],['t',215,468,'C₄'],['t',400,365,'クエン酸回路',18],
+['o',540,363],['s',680,320,'NADH','b','2'],['s',680,405,'CO2','b','2'],['a',540,363,680,320],['a',540,363,680,405],
+['o',400,492],['s',280,585,'ATP','c','2'],['s',410,585,'NADH','c','2'],['s',540,585,'CO2','c','2'],['a',400,492,280,585],['a',400,492,410,585],['a',400,492,540,585],
+['o',260,363],['s',110,330,'NADH','d','2'],['s',110,400,'FADH2','d','2'],['a',260,363,110,330],['a',260,363,110,400]]},
+{H:460,it:[['l',20,40,780,40],['t',40,30,'外膜',13],['t',70,78,'膜間腔（H⁺高）',13],['l',20,150,780,150],['l',20,212,780,212],['t',40,185,'内膜',13],['t',100,440,'マトリックス（H⁺低）',13],
+['c',140,180,38,50],['c',290,185,34,30],['c',440,180,38,50],['c',560,180,38,50],['r',680,105,100,115,'ATP合成酵素'],
+['t',140,185,'e⁻'],['t',290,190,'e⁻'],['t',440,185,'e⁻'],['t',560,185,'e⁻'],['a',140,180,290,185],['a',290,185,440,180],['a',440,180,560,180],
+['a',140,180,140,100],['t',140,90,'H⁺'],['a',440,180,440,100],['t',440,90,'H⁺'],['a',560,180,560,100],['t',560,90,'H⁺'],['t',730,66,'H⁺'],['a',730,76,730,162],
+['s',80,320,'NADH','','10'],['a',80,320,140,180],['s',200,320,'NAD+','','10'],['a',140,180,200,320],
+['s',295,320,'FADH2','','2'],['a',295,320,290,185],['s',400,320,'FAD','','2'],['a',290,185,400,320],
+['s',500,320,'酸素','','6'],['a',500,320,560,180],['s',610,320,'水','','12'],['a',560,180,610,320],
+['s',655,400,'ADP'],['a',655,400,730,162],['s',738,400,'ATP'],['a',730,162,738,400]]}];
+let G=[],GR=[];
+let i=0,score=0,sel=null,t0=0,tries=0,hinted=false,done=false,mem=null;
+const $=id=>document.getElementById(id);
+const load=()=>{try{mem=JSON.parse(localStorage.getItem('meta5'))}catch(e){}if(!mem)mem={s:S.map(()=>({a:0,c:0,t:[]})),w:{},r:[]}};
+const save=()=>{try{localStorage.setItem('meta5',JSON.stringify(mem))}catch(e){}};
+function beep(ok){try{const c=new(window.AudioContext||window.webkitAudioContext)();
+if(ok){[[784,0],[988,.09],[1175,.18],[1568,.27],[2093,.36]].forEach(([fr,t])=>{const o=c.createOscillator(),g=c.createGain(),s=c.currentTime+t;o.type='sine';o.frequency.value=fr;o.connect(g);g.connect(c.destination);g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(.16,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+.28);o.start(s);o.stop(s+.3)})}
+else{const o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.frequency.value=180;o.type='sawtooth';g.gain.value=.15;o.start();o.stop(c.currentTime+.3)}}catch(e){}}
+function card(k){const d=document.createElement('div');d.className='card '+K[k][1];d.textContent=K[k][0]+' '+lab(k);d.dataset.k=k;return d}
+function pool(){const p=$('pool');p.innerHTML='';Object.keys(K).forEach(k=>{const c=card(k);c.draggable=true;c.tabIndex=0;
+c.ondragstart=e=>{e.dataTransfer.setData('text/plain',k)};
+c.onclick=()=>{sel=sel===k?null:k;[...p.children].forEach(x=>x.classList.toggle('sel',x.dataset.k===sel))};
+c.onkeydown=e=>{if(e.key==='Enter')c.onclick()};p.append(c)})}
+function put(s,k){s.classList.remove('ok','ng');s.innerHTML='';if(k){s.append(card(k));s.dataset.k=k}else delete s.dataset.k;trimAll()}
+function render(){const s=S[i],F=FIG[i],f=$('field'),W=780;G=[];GR=[];
+$('st').textContent='ステージ '+(i+1)+' / '+S.length+'　'+s.n.split(' ')[1];$('sc').textContent='スコア: '+score+'点';
+let sv='',sl='';
+F.it.forEach(a=>{const k=a[0];
+if(k==='t')sv+='<text x="'+a[1]+'" y="'+a[2]+'" font-size="'+(a[4]||14)+'" text-anchor="middle" font-weight="700">'+a[3]+'</text>';
+else if(k==='a')sv+='<line x1="'+a[1]+'" y1="'+a[2]+'" x2="'+a[3]+'" y2="'+a[4]+'" marker-end="url(#ah)" data-o="'+a.slice(1,5)+'"/>';
+else if(k==='l')sv+='<line x1="'+a[1]+'" y1="'+a[2]+'" x2="'+a[3]+'" y2="'+a[4]+'" stroke-dasharray="6 5"/>';
+else if(k==='p')sv+='<path d="'+a[1]+'" data-o="'+a[1]+'" marker-end="url(#ah)"/>';
+else if(k==='r')sv+='<rect x="'+a[1]+'" y="'+a[2]+'" width="'+a[3]+'" height="'+a[4]+'" rx="10"/><text x="'+(a[1]+a[3]/2)+'" y="'+(a[2]+a[4]/2+5)+'" font-size="14" text-anchor="middle" font-weight="700">'+a[5]+'</text>';
+else if(k==='c')sv+='<ellipse cx="'+a[1]+'" cy="'+a[2]+'" rx="'+a[3]+'" ry="'+a[4]+'"/>';
+else if(k==='o')sv+='<circle class="dot" cx="'+a[1]+'" cy="'+a[2]+'" r="5"/>';
+else if(k==='s'){const n=G.push(a[3])-1;GR[n]=a[4]||'';sl+='<div class="slot" data-g="'+n+'"'+(a[5]?' data-c="'+a[5]+'"':'')+' tabindex="0" style="left:'+(a[1]/W*100)+'%;top:'+(a[2]/F.H*100)+'%"></div>'}});
+f.innerHTML='<div class="q">❓ '+s.q+'</div><div class="fw"><div class="fg" style="aspect-ratio:'+W+'/'+F.H+'"><svg viewBox="0 0 '+W+' '+F.H+'"><defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z"/></marker></defs>'+sv+'</svg>'+sl+'</div></div>';
+trimAll();f.querySelectorAll('.slot').forEach(sl=>{
+sl.ondragover=e=>{e.preventDefault();sl.classList.add('over')};sl.ondragleave=()=>sl.classList.remove('over');
+sl.ondrop=e=>{e.preventDefault();sl.classList.remove('over');if(!done)put(sl,e.dataTransfer.getData('text/plain'))};
+sl.onclick=()=>{if(done)return;if(sel)put(sl,sel);else put(sl,null)}});
+$('msg').textContent='';$('msg').className='';$('ex').hidden=true;$('nxt').hidden=true;$('chk').hidden=false;
+done=false;tries=0;hinted=false;t0=Date.now();
+}
+function trimAll(){const fg=document.querySelector('.fg');if(!fg)return;const fr=fg.getBoundingClientRect(),k=780/fr.width,B=[];
+fg.querySelectorAll('.slot').forEach(s=>{const r=s.getBoundingClientRect();B.push([(r.left-fr.left)*k-5,(r.top-fr.top)*k-5,(r.right-fr.left)*k+5,(r.bottom-fr.top)*k+5])});
+fg.querySelectorAll('svg rect,svg ellipse').forEach(e=>{const b=e.getBBox();B.push([b.x-4,b.y-4,b.x+b.width+4,b.y+b.height+4])});
+const In=p=>B.some(b=>p[0]>b[0]&&p[0]<b[2]&&p[1]>b[1]&&p[1]<b[3]);
+fg.querySelectorAll('svg [data-o]').forEach(e=>{const P=[],ln=e.tagName==='line';
+if(ln){const[a,b,c,d]=e.dataset.o.split(',').map(Number);for(let i=0;i<=80;i++)P.push([a+(c-a)*i/80,b+(d-b)*i/80])}
+else{const t=document.createElementNS('http://www.w3.org/2000/svg','path');t.setAttribute('d',e.dataset.o);const L=t.getTotalLength();for(let i=0;i<=80;i++){const q=t.getPointAtLength(L*i/80);P.push([q.x,q.y])}}
+while(P.length>3&&In(P[0]))P.shift();while(P.length>3&&In(P[P.length-1]))P.pop();
+if(ln){e.setAttribute('x1',P[0][0]);e.setAttribute('y1',P[0][1]);e.setAttribute('x2',P[P.length-1][0]);e.setAttribute('y2',P[P.length-1][1])}else e.setAttribute('d','M'+P.map(p=>p.join(' ')).join('L'))})}
+window.addEventListener('resize',trimAll);
+function check(){if(done)return;const s=S[i],f=$('field');
+const ss=[...f.querySelectorAll('.slot')];tries++;let ng=0;const bad=[],rem={};ss.forEach((x,n)=>{if(GR[n])(rem[GR[n]]=rem[GR[n]]||[]).push(G[n])});
+ss.forEach((x,n)=>{const v=x.dataset.k,g=GR[n];let ok;if(g){const a=rem[g],j=a.indexOf(v);ok=j>=0;if(ok)a.splice(j,1)}else ok=v===G[n];x.classList.remove('ok','ng');x.classList.add(ok?'ok':'ng');if(!ok){ng++;if(x.dataset.k)bad.push(x.dataset.k)}});
+const m=mem.s[i];m.a++;
+if(!ng){m.c++;m.t.push(Math.round((Date.now()-t0)/1000));const pt=tries===1?(hinted?15:25):10;score+=pt;mem.r.push({n:$('nm').value.trim()||'(名前なし)',i:i,p:pt,t:tries,sec:Math.round((Date.now()-t0)/1000)});done=true;beep(true);
+$('msg').className='ok';$('msg').textContent='🎉 正解！';$('ex').hidden=false;$('ex').textContent=s.e;
+$('chk').hidden=true;$('nxt').hidden=false;$('nxt').textContent=i<S.length-1?'次のステージへ':'最初からもう一度';$('sc').textContent='スコア: '+score+'点'}
+else{bad.forEach(k=>mem.w[k]=(mem.w[k]||0)+1);beep(false);$('msg').className='ng';$('msg').textContent='❌ '+ng+'か所ちがうよ（赤い枠）。緑の枠はOK！もう一度考えよう'}
+save();if($('tm').checked)teacher()}
+function teacher(){const t=$('teacher');t.hidden=!$('tm').checked;if(t.hidden)return;
+const rows=S.map((s,j)=>{const m=mem.s[j],av=m.t.length?Math.round(m.t.reduce((x,y)=>x+y,0)/m.t.length)+'秒':'-';
+return `<tr><td>${s.n}</td><td>${m.a?Math.round(m.c/m.a*100)+'%':'-'} (${m.c}/${m.a})</td><td>${av}</td></tr>`}).join('');
+const w=Object.entries(mem.w).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,n])=>lab(k)+'（'+n+'回）').join('、')||'まだデータなし';
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),by={};mem.r.forEach(r=>{(by[r.n]=by[r.n]||{})[r.i]=r});
+const rec='<p><b>この端末の記録（名前別）</b></p><table style="width:100%;border-collapse:collapse;text-align:left"><tr><th>名前</th><th>クリア</th><th>合計点</th></tr>'+(Object.entries(by).map(([n,o])=>{const v=Object.values(o);return '<tr><td>'+esc(n)+'</td><td>'+v.length+'/'+S.length+'</td><td>'+v.reduce((a,r)=>a+r.p,0)+'点</td></tr>'}).join('')||'<tr><td colspan="3">まだ記録なし</td></tr>')+'</table>';
+t.innerHTML='<b>教師モード</b>（この端末の記録）<table style="width:100%;margin-top:6px;border-collapse:collapse;text-align:left"><tr><th>ステージ</th><th>正答率</th><th>平均クリア時間</th></tr>'+rows+'</table><p>間違いやすいカード：'+w+'</p>'+rec+'<button id="rs">記録をリセット</button>';
+$('rs').onclick=()=>{mem={s:S.map(()=>({a:0,c:0,t:[]})),w:{},r:[]};save();teacher()}}
+$('chk').onclick=check;
+$('hint').onclick=()=>{hinted=true;$('msg').className='';$('msg').textContent='💡 ヒント：'+S[i].h};
+$('nxt').onclick=()=>{if(i<S.length-1)i++;else{i=0;score=0}render()};
+$('tm').onchange=teacher;
+load();mem.r=mem.r||[];pool();render();
+(function(){try{$('nm').value=localStorage.getItem('metaNm')||''}catch(e){}
+$('nm').oninput=()=>{try{localStorage.setItem('metaNm',$('nm').value)}catch(e){}};
+$('sub').onclick=()=>{const nm=$('nm').value.trim()||'(名前なし)',L=['名前：'+nm];let tot=0;
+S.forEach((s,k)=>{const r=[...mem.r].reverse().find(x=>x.i===k&&x.n===nm);if(r){tot+=r.p;L.push('ステージ'+(k+1)+' '+s.n.split(' ')[1]+'：'+r.p+'点（'+r.t+'回目で正解・'+r.sec+'秒）')}else L.push('ステージ'+(k+1)+' '+s.n.split(' ')[1]+'：まだ')});
+L.splice(1,0,'合計：'+tot+'点');$('sbt').value=L.join('\n');$('cpm').textContent='';$('sb').hidden=false};
+$('cp').onclick=()=>{$('sbt').select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}$('cpm').textContent=ok?'コピーしたよ！':'選んだ文章を、長押し（またはCtrl+C）でコピーしてね'};
+$('sbx').onclick=()=>{$('sb').hidden=true}})();
+(function(){$('tm').parentElement.style.display='none';const h1=document.querySelector('h1');let n=0,t;
+function unlock(){let pw=null;try{pw=localStorage.getItem('metaPw')}catch(e){}
+const b=$('pw'),i=$('pwi');$('pwl').textContent=pw?'教師用パスワード':'教師用パスワードを決めてください（この端末だけに保存されます）';b.hidden=false;i.value='';i.focus();
+i.onkeydown=e=>{if(e.key==='Enter')$('pwok').click()};
+$('pwok').onclick=()=>{const v=i.value;if(!v)return;if(!pw){try{localStorage.setItem('metaPw',v)}catch(e){}pw=v}
+if(v!==pw){$('pwl').textContent='パスワードがちがいます';i.value='';return}b.hidden=true;$('tm').checked=true;teacher()};
+$('pwno').onclick=()=>{b.hidden=true}}
+h1.onclick=()=>{n++;clearTimeout(t);t=setTimeout(()=>{n=0},2000);if(n<5)return;n=0;
+if($('tm').checked){$('tm').checked=false;teacher();return}unlock()}})();
+</script></body></html>
